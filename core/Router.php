@@ -26,6 +26,19 @@ class Router {
 			die('that method dont exist in the controller \"' . $controller_name . '\"' );
 		} 
 
-	}
+	} // end of method route 
+
+	public static function redirect($location) {
+		if(!headers_sent()) {
+			header('Location: '.PROOT.$location);
+			exit();
+		}else {
+			echo '<script>window.location.href="'.PROOT.$location.'";</script>';
+			echo '<noscript>';
+			echo '<meta http-equiv="refresh" content="0;url='.$location.'"/>';
+			echo '</noscript>';
+			exit();
+		}
+	} // end of method redirect
 
 }

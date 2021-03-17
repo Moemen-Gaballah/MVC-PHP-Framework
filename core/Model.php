@@ -7,14 +7,15 @@ class Model {
 	public function __construct($table) {
 		$this->_db = DB::getInstance();
 		$this->_table = $table;
-		$this->_SetTableColumns();
+		$this->_setTableColumns();
 		$this->_modelName = str_replace(' ', '', ucwords(str_replace('_', ' ', $this->_table))); 
 	} // end of construct
 
-	protected function _SetTableColumns() {
+	protected function _setTableColumns() {
 		$columns = $this->get_columns();
 		foreach ($columns as $column) {
-			$this->_columnNames[] = $column->field;
+			$_columnName = $column->Field;
+			$this->_columnNames[] = $column->Field;
 			$this->{$_columnName} = null;
 		}
 	} // end of set tables columns 
@@ -37,12 +38,14 @@ class Model {
 	public function findFirst($params = []) {
 		$resultQuery = $this->_db->findFirst($this->_table, $params);
 		$result = new $this->_modelName($this->_table);
+		if($resultQuery){
 		$result->populateObjData($resultQuery);
+		}
 		return $result;
 	} // end of method find First 
 
 	public function findById($id) {
-		$return $this->findFirst(['conditions' => "id = ?", 'bind' => [$id]]);
+		return $this->findFirst(['conditions' => "id = ?", 'bind' => [$id]]);
 	} // end of method find by id
 
 	public function save() {
