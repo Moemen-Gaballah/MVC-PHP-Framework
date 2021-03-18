@@ -51,8 +51,9 @@ class Model {
 	public function save() {
 		$fields = [];
 		foreach ($this->_columnNames as $column) {
-			$fields[$column] = $this->column;
+			$fields[$column] = $this->$column;
 		} 
+		
 		// determine whether to update or insert 
 		if(property_exists($this, 'id') && $this->id != ''){
 			return $this->update($this->id, $fields);
@@ -62,7 +63,7 @@ class Model {
 	} // end of method save
 
 	public function insert($fields) {
-		if($empty($fields)) return false;
+		if(empty($fields)) return false;
 		return $this->_db->insert($this->_table, $fields);
 	} // end of method insert 
 
@@ -71,14 +72,15 @@ class Model {
 		return $this->_db->update($this_table, $id, $fields);
 	} // end of method update
 
-	public function delete($id) {
-		if($id == '' && $this->id == '') return false;
+	public function delete($id ='') {
+		if($id == '' && $this->id == '')  return false;
 		$id = ($id == '') ? $this->id : $id; 
 
 		if($this->_softDelete) {
 			return $this->update($id, ['deleted' => 1]);
+		}else{
+			return $this->_db->delete($this->_table, $id);
 		}
-		return $this->_db->delete($this->_table, $id);
 	} // end of method delete 
 
 	public function query($sql, $bind=[]) {

@@ -18,3 +18,6 @@ define('SITE_TITLE', 'Moemen MVC Framework'); // This will be used if no site ti
 define('CURRENT_USER_SESSION_NAME', 'dzXKgrpPwRgNKaPyMSdrSgd'); // session name for logged in user
 define('REMEMBER_ME_COOKIE_NAME', 'HAHEI6382LSJVlaQSADWA'); // session name for logged in user remember me 
 define('REMEMBER_ME_COOKIE_EXPIRY', 604800); // time in seconds for remember me cookie to live (7 days);
+
+define('ACCESS_RESTRICTED', 'Restricted'); // controller name for the restricted redirect
+

@@ -32,14 +32,14 @@ class Validate {
 						case 'matches':
 						if($value != $source[$rule_value]) {
 								$matchDisplay = $items[$rule_value]['display'];
-								$this->addError(["{$matchDisplay} and {display} must match.", $item]);
+								$this->addError(["{$matchDisplay} and {$display} must match.", $item]);
 							}
 						break;
 
 						case 'unique': 
 							$check = $this->_db->query("SELECT {$item} FROM {$rule_value} WHERE {$item} = ?", [$value]);
 							if($check->count()) {
-								$this->addError(["{$display} already exists. Please choose another {display}", $item]);
+								$this->addError(["{$display} already exists. Please choose another {$display}", $item]);
 							}
 						break;
 
@@ -49,7 +49,7 @@ class Validate {
 							$id = $t[1];
 							$query = $this->_db->query("SELECT * FROM {$table} WHERE id != ? AND {$item} = ?", [$id,$value]);
 							if($query->count()) {
-								$this->addError(["{$display} already exist. Please choose another {display}.", $item]);
+								$this->addError(["{$display} already exist. Please choose another {$display}.", $item]);
 							}
 						break;
 

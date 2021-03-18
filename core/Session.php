@@ -15,7 +15,7 @@ class Session {
 	}
 
 	public static function delete($name) {
-		if(self::esists($name)) {
+		if(self::exists($name)) {
 			unset($_SESSION[$name]);
 		}
 	}

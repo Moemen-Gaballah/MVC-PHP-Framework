@@ -22,21 +22,65 @@ class Users extends Model {
 				}
 			}
 		}
-	}
+	} // end of method construct
 
 	public function findByUsername($username) {
-		return $this->findFirst(['conditions'=>'username = ?', 'bind'=>[$username]]);
-	}
+		return $this->findFirst(['conditions'=> 'username = ?', 'bind'=>[$username]]);
+	} // end of method find by user name
+
+	public static function currentLoggedInUser() {
+		if(!isset(self::$currentLoggedInUser) && Session::exists(CURRENT_USER_SESSION_NAME)){
+			$u = new Users((int)Session::get(CURRENT_USER_SESSION_NAME));
+			self::$currentLoggedInUser = $u;
+		} 
+		
+		return self::$currentLoggedInUser;
+	} // end of function current Logged In user
 
 	public function login($rememberMe=false) {
 		Session::set($this->_sessionName, $this->id);
 		if($rememberMe){
-			$hash=md5(uniqid()+rand(0,100));
+			$hash = md5(uniqid()+rand(0,100));
 			$user_agent = Session::uagent_no_version();
-			Cookie::set($this->_cookieName, $hash, REMEMBER_COOKIE_EXPIRY);
+			Cookie::set($this->_cookieName, $hash, REMEMBER_ME_COOKIE_EXPIRY);
 			$fields = ['session'=>$hash, 'user_agent'=>$user_agent, 'user_id'=>$this->id];
 			$this->_db->query('DELETE FROM user_sessions WHERE user_id = ? AND user_agent = ?', [$this->id, $user_agent]);
 			$this->_db->insert('user_sessions', $fields);
 		}
+	} // end of method login 
+
+	public static function loginUserFromCookie() {
+		$userSession = UserSessions::getFromCookie();
+		if($userSession->user_id != '') {
+			$user = new self((int)$userSession->user_id);
+		}
+		if($user) {
+			$user->login();
+		}
+		return $user;
+	} // end of method login user from cookie
+
+	public function logout() {
+		$userSession = UserSessions::getFromCookie();
+		if($userSession) 
+
+		$userSession->delete($_SESSION['dzXKgrpPwRgNKaPyMSdrSgd']);
+
+		if(Cookie::exists(REMEMBER_ME_COOKIE_NAME)){
+			Cookie::delete(REMEMBER_ME_COOKIE_NAME);
+		}
+		self::$currentLoggedInUser = null;
+		return true;
+	} // end of method logout
+
+	public function registerNewUser($params) {
+		$this->assign($params);
+		$this->password = password_hash($this->password, PASSWORD_DEFAULT);
+		$this->save();
+	} // end of method register new user
+
+	public function acls() {
+		if(empty($this->acl)) return [];
+		return json_decode($this->acl, true);
 	}
 }

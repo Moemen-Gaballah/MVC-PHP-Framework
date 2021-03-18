@@ -14,7 +14,8 @@ class Cookie
 	}
 
 	public static function delete($name) {
-		self::set($name, '', time()-1);
+		self::set($name, '', time() -1);
+		dd('model cookie method delete' . $name);
 	}
 
 	public static function get($name) {

@@ -7,6 +7,8 @@ class DB {
 	private function __construct() {
 		try {
 			$this->_pdo = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASSWORD);
+			$this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			$this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 		} catch(PDOException $e) {
 			die($e->getMessage());
 		}
@@ -25,24 +27,23 @@ class DB {
 			$x = 1;
 			if(count($params)) {
 				foreach ($params as $param) {
-					// dd($params);
 					$this->_query->bindValue($x, $param);
 					$x++;
 				}
 			}
-
 			if($this->_query->execute()) {
 				$this->_result = $this->_query->fetchALL(PDO::FETCH_OBJ);
 				$this->_count = $this->_query->rowCount();
 				$this->_lastInsertID = $this->_pdo->lastInsertId();
 			} else {
+			
 				$this->_error = true;
 			} 
 			return $this;
 		}
 	} // end of method query
 
-	protected function _read($table, $params=[]) {
+	protected function read($table, $params=[]) {
 		$conditionString = '';
 		$bind = [];
 		$order = '';
@@ -60,7 +61,7 @@ class DB {
 				$conditionString = $params['conditions'];
 			}
 			if($conditionString != ''){
-				$conditionString = ' Where ' . $conditionString;
+				$conditionString = ' WHERE ' . $conditionString;
 			}
 		}
 		// bind 
@@ -79,7 +80,7 @@ class DB {
 			$limit = ' LIMIT ' . $params['limit'];
 		}
 
-		$sql = "SELECT * FROM {$table}{$conditionString}{$order}{$limit}";
+		$sql = "SELECT * FROM {$table} {$conditionString} {$order} {$limit}";
 		if($this->query($sql, $bind)) {
 			if(!count($this->_result)) 
 				return false;
@@ -91,14 +92,14 @@ class DB {
 
 
 	public function find($table, $params=[]) {
-		if($this->_read($table, $params)) {
+		if($this->read($table, $params)) {
 			return $this->results();
 		}
 		return false;
 	} // end of method find
 
 	public function findFirst($table, $params=[]) {
-		if($this->_read($table, $params)) {
+		if($this->read($table, $params)) {
 			return $this->first();
 		}
 		return false; 
@@ -169,7 +170,7 @@ class DB {
 	} // end of method last
  
 	public function error() {
-			return $this->_error;
+		return $this->_error;
 	} // end of method error
 
 } // end of class DB:
